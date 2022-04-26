@@ -7,5 +7,4 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
-nix = "0.24.1"
 byteorder = "1.4.3"

