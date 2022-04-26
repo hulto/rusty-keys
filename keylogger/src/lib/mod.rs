@@ -63,7 +63,7 @@ pub(crate) fn start_keylogger(log_file: String, timeout: u64) -> Result<()> {
     }
     #[cfg(target_os = "macos")]
     {
-        let _res = nix::mac_log_keys(keyboard_device_path.unwrap(), log_file, timeout);    
+        let _res = mac::mac_log_keys(log_file, timeout);    
     }
     Ok(())
 }

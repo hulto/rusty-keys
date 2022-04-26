@@ -1,4 +1,5 @@
 use rdev::{listen, Event};
+use anyhow::Result;
 
 
 fn callback(event: Event) {
@@ -10,5 +11,9 @@ fn callback(event: Event) {
 }
 
 pub(crate) fn mac_log_keys(log_file: String, write_interval: u64) -> Result<()> {
-    listen(callback)
+    println!("Starting");
+    if let Err(error) = listen(callback) {
+        println!("Error: {:?}", error)
+    }
+    Ok(())
 }
