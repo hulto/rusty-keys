@@ -1,6 +1,8 @@
 use std::{time::SystemTime, collections::HashMap, fs::{OpenOptions}, io::Write};
 use anyhow::Result;
+#[cfg(target_os = "linux")]
 mod nix;
+#[cfg(target_os = "macos")]
 mod mac;
 
 

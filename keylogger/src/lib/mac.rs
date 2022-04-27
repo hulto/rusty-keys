@@ -1,5 +1,5 @@
 use std::{fs::OpenOptions, time::SystemTime, fmt, collections::HashMap};
-
+#[cfg(target_os != "linux")]
 use rdev::{listen, Event, EventType, Key};
 use anyhow::Result;
 
