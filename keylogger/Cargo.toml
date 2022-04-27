@@ -9,8 +9,6 @@ edition = "2021"
 anyhow = "1.0"
 byteorder = "1.4.3"
 tempfile = "3.3.0"
-fork = "0.1.19"
-enigo = "0.0.14"
 
 [target.'cfg(any(windows, macos))'.dependencies]
 rdev = "0.5.1"

