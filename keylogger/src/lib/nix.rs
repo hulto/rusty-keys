@@ -17,7 +17,7 @@ fn get_key_hash_map() -> HashMap<u16, &'static str> {
         (39 as u16, ";"),
         (40 as u16, "'"),
         (28 as u16, "[retun]"),
-        (14 as u16, "[delete]"),
+        (14 as u16, "[backspace]"),
         (42 as u16, "[shift]"),
         (42 as u16, "[Lshift]"),
         (44 as u16, "z"),
@@ -61,14 +61,13 @@ fn get_key_hash_map() -> HashMap<u16, &'static str> {
         (27 as u16, "]"),
         (43 as u16, "\\"),
         (58 as u16, "[capslock]"),
-        (57 as u16, "[space]"),
         (103 as u16, "[uparrow]"),
         (106 as u16, "[rightarrow]"),
         (105 as u16, "[leftarrow]"),
         (108 as u16, "[downarrow]"),
         (57 as u16, "[space]"),
         (125 as u16, "[Lfunction]"),
-        (126 as u16, "[Rcommand]"),
+        (126 as u16, "[Rmeta]"),
         (59 as u16, "[F1]"),
         (60 as u16, "[F2]"),
         (61 as u16, "[F3]"),
@@ -94,7 +93,7 @@ fn get_key_hash_map() -> HashMap<u16, &'static str> {
         (39 as u16, "s"),
         (40 as u16, "-"),
         (28 as u16, "[retun]"),
-        (14 as u16, "[delete]"),
+        (14 as u16, "[backspace]"),
         (42 as u16, "[shift]"),
         (42 as u16, "[Lshift]"),
         (44 as u16, ";"),
@@ -138,14 +137,13 @@ fn get_key_hash_map() -> HashMap<u16, &'static str> {
         (27 as u16, "="),
         (43 as u16, "\\"),
         (58 as u16, "[capslock]"),
-        (57 as u16, "[space]"),
         (103 as u16, "[uparrow]"),
         (106 as u16, "[rightarrow]"),
         (105 as u16, "[leftarrow]"),
         (108 as u16, "[downarrow]"),
         (57 as u16, "[space]"),
         (125 as u16, "[Lfunction]"),
-        (126 as u16, "[Rcommand]"),
+        (126 as u16, "[Rmeta]"),
         (59 as u16, "[F1]"),
         (60 as u16, "[F2]"),
         (61 as u16, "[F3]"),
@@ -157,7 +155,7 @@ fn get_key_hash_map() -> HashMap<u16, &'static str> {
         (67 as u16, "[F9]"),
         (68 as u16, "[F0]"),
     ]);
-    return _dvorak_map_no_mod;
+    return _qwerty_map_no_mod;
 }
 
 pub(crate) fn nix_find_keyboard_device() -> Result<String> {
