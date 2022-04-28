@@ -9,9 +9,12 @@ edition = "2021"
 anyhow = "1.0"
 byteorder = "1.4.3"
 tempfile = "3.3.0"
+<<<<<<< HEAD
 fork = "0.1.19"
 enigo = "0.0.14"
 clap = { version = "3.1.12", features = ["derive"] }
+=======
+>>>>>>> 2460ad361cf4d1bc3c8075a25534c3166b66c02c
 
 [target.'cfg(any(windows, macos))'.dependencies]
 rdev = "0.5.1"
